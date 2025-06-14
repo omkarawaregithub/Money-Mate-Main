@@ -2,7 +2,7 @@
 "use client";
 
 import type { Dispatch, SetStateAction } from 'react';
-import { useCallback, useEffect, useState } from 'react'; // Added useEffect and useState
+import { useCallback, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import type { Transaction, Currency } from '@/types';
 import useLocalStorage from './useLocalStorage';
@@ -10,8 +10,6 @@ import { useAppSettingsContext } from '@/context/AppSettingsContext';
 
 const TRANSACTIONS_STORAGE_KEY = 'moneyMate_transactions';
 
-// The data passed to addTransaction will now include currency
-// Transaction type itself has currency, so Omit<Transaction, 'id' | 'date'> includes currency
 type AddTransactionData = Omit<Transaction, 'id' | 'date'> & { date: Date };
 
 interface UseTransactionsReturn {
@@ -22,7 +20,7 @@ interface UseTransactionsReturn {
   totalIncome: number;
   totalExpenses: number;
   balance: number;
-  setTransactions: Dispatch<SetStateAction<Transaction[]>>; // This will update localStorageTransactions
+  setTransactions: Dispatch<SetStateAction<Transaction[]>>;
 }
 
 export default function useTransactions(initialTransactionsFromProp: Transaction[] = []): UseTransactionsReturn {
@@ -35,18 +33,27 @@ export default function useTransactions(initialTransactionsFromProp: Transaction
   const globalAppCurrency = appSettings.currency;
 
   useEffect(() => {
-    // Migrate transactions loaded from localStorage or initial props
-    const defaultCurrencyForMigration: Currency = 'USD'; // Default for old transactions missing currency
+    const defaultCurrencyForMigration: Currency = 'USD'; 
     
     const migrated = localStorageTransactions.map(tx => {
+      // Ensure tx is a valid object and has an id before processing
+      if (typeof tx !== 'object' || tx === null || !tx.id) {
+        // Log or handle malformed transaction data if necessary
+        // For now, we'll assume valid transactions are objects with IDs,
+        // and malformed ones might get filtered out if we added .filter(Boolean)
+        // For robustness, ensure all tx have a currency.
+        // If tx itself is fundamentally broken, it might need more specific handling or filtering.
+      }
+
       // Check if currency property exists and is valid, otherwise assign default
-      if (!tx.currency || (tx.currency !== 'USD' && tx.currency !== 'INR')) {
+      // Valid currencies are 'USD' or 'INR'. Anything else gets migrated.
+      if (!tx.currency || (typeof tx.currency === 'string' && !['USD', 'INR'].includes(tx.currency as Currency))) {
         return { ...tx, currency: defaultCurrencyForMigration };
       }
       return tx;
     });
     setProcessedTransactions(migrated);
-  }, [localStorageTransactions]); // Rerun migration if localStorageTransactions data changes
+  }, [localStorageTransactions]);
 
   const addTransaction = useCallback(
     (newTransactionData: AddTransactionData) => {
@@ -57,9 +64,8 @@ export default function useTransactions(initialTransactionsFromProp: Transaction
         amount: newTransactionData.amount,
         date: newTransactionData.date.toISOString().split('T')[0],
         description: newTransactionData.description,
-        currency: newTransactionData.currency,
+        currency: newTransactionData.currency, // Currency is now part of newTransactionData
       };
-      // This updates localStorageTransactions, which then triggers the useEffect for processing
       setLocalStorageTransactions((prevTransactions) => [newTransaction, ...prevTransactions]);
     },
     [setLocalStorageTransactions]
@@ -87,6 +93,7 @@ export default function useTransactions(initialTransactionsFromProp: Transaction
 
   const { totalIncome, totalExpenses, balance } = processedTransactions.reduce(
     (acc, transaction) => {
+      // Only sum transactions matching the global app currency for dashboard summary
       if (transaction.currency === globalAppCurrency) {
         if (transaction.type === 'income') {
           acc.totalIncome += transaction.amount;
@@ -94,20 +101,20 @@ export default function useTransactions(initialTransactionsFromProp: Transaction
           acc.totalExpenses += transaction.amount;
         }
       }
-      acc.balance = acc.totalIncome - acc.totalExpenses;
+      acc.balance = acc.totalIncome - acc.totalExpenses; // This balance is specific to globalAppCurrency
       return acc;
     },
     { totalIncome: 0, totalExpenses: 0, balance: 0 }
   );
   
   return {
-    transactions: processedTransactions, // Return the migrated/processed transactions
+    transactions: processedTransactions,
     addTransaction,
     deleteTransaction,
     updateTransaction,
     totalIncome,
     totalExpenses,
     balance,
-    setTransactions: setLocalStorageTransactions, // Expose setter for localStorage raw data
+    setTransactions: setLocalStorageTransactions,
   };
 }

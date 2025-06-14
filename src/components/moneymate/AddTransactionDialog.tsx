@@ -5,7 +5,6 @@ import { useEffect, useMemo } from 'react';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-// import { v4 as uuidv4 } from 'uuid'; // Not used here, ID generated in hook
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -38,7 +37,7 @@ import { useAppSettingsContext } from '@/context/AppSettingsContext';
 const formSchema = z.object({
   type: z.enum(['income', 'expense'], { required_error: "Transaction type is required." }),
   amount: z.coerce.number().positive({ message: "Amount must be positive." }),
-  currency: z.enum(['USD', 'INR'], { required_error: "Currency is required."}),
+  currency: z.enum(['USD', 'INR'], { required_error: "Currency is required."}), // Currency is now part of the form
   category: z.string().min(1, { message: "Category is required." }),
   date: z.date({ required_error: "Date is required." }),
   description: z.string().optional(),
@@ -49,7 +48,6 @@ type TransactionFormData = z.infer<typeof formSchema>;
 interface AddTransactionDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  // The type of addTransaction needs to be able to accept TransactionFormData
   addTransaction: (transaction: Omit<Transaction, 'id' | 'date'> & { date: Date }) => void;
   updateTransaction: (transaction: Transaction) => void;
   existingTransaction?: Transaction | null;
@@ -64,12 +62,11 @@ export default function AddTransactionDialog({
 }: AddTransactionDialogProps) {
   const { toast } = useToast();
   const { appSettings } = useAppSettingsContext();
-  // const [selectedType, setSelectedType] = useState<TransactionType>(existingTransaction?.type || 'expense'); // Not directly used for category list logic
 
   const defaultValues: TransactionFormData = useMemo(() => ({
     type: existingTransaction?.type || 'expense',
     amount: existingTransaction?.amount || 0,
-    currency: existingTransaction?.currency || appSettings.currency,
+    currency: existingTransaction?.currency || appSettings.currency, // Default to existing or global app setting
     category: existingTransaction?.category || '',
     date: existingTransaction?.date ? new Date(existingTransaction.date) : new Date(),
     description: existingTransaction?.description || '',
@@ -91,23 +88,22 @@ export default function AddTransactionDialog({
   const currentType = watch('type', defaultValues.type);
 
   useEffect(() => {
-    if (isOpen) { // Only reset form when dialog opens or existingTransaction changes
+    if (isOpen) {
       if (existingTransaction) {
           reset({
               type: existingTransaction.type,
               amount: existingTransaction.amount,
-              currency: existingTransaction.currency,
+              currency: existingTransaction.currency, // Use existing transaction's currency
               category: existingTransaction.category,
               date: new Date(existingTransaction.date),
               description: existingTransaction.description || '',
           });
       } else {
-          // For new transactions, default currency to global app setting
           reset({
             ...defaultValues,
-            currency: appSettings.currency, 
-            type: 'expense', // Sensible default
-            category: '' // Reset category for new
+            currency: appSettings.currency, // For new transactions, default to global app setting
+            type: 'expense', 
+            category: '' 
           });
       }
     }
@@ -116,26 +112,26 @@ export default function AddTransactionDialog({
 
   const onSubmit: SubmitHandler<TransactionFormData> = (data) => {
     try {
-      // The data from the form (TransactionFormData) matches Omit<Transaction, 'id' | 'date'> & { date: Date }
-      // because formSchema has `date: z.date()` and `currency: z.enum(...)`
       const transactionDataForHook = {
         type: data.type,
         amount: data.amount,
-        currency: data.currency,
+        currency: data.currency, // Pass the selected currency
         category: data.category,
         description: data.description,
-        date: data.date, // This is a Date object, hook expects it
+        date: data.date, 
       };
 
       if (existingTransaction) {
+        // For updateTransaction, ensure the date is in 'yyyy-MM-dd' string format if your hook expects that
+        // The Transaction type defines date as string, so convert data.date (which is a Date object from the form)
         updateTransaction({ ...transactionDataForHook, id: existingTransaction.id, date: data.date.toISOString().split('T')[0] });
         toast({ title: "Success", description: "Transaction updated successfully." });
       } else {
-        addTransaction(transactionDataForHook);
+        // addTransaction expects date as a Date object as per its type Omit<Transaction, 'id' | 'date'> & { date: Date }
+        addTransaction(transactionDataForHook); 
         toast({ title: "Success", description: "Transaction added successfully." });
       }
       onClose();
-      // Reset to initial default values for a new form, respecting global currency for new
       reset({...defaultValues, currency: appSettings.currency, type: 'expense', category: ''}); 
     } catch (error) {
       console.error("Failed to save transaction:", error);
@@ -164,8 +160,7 @@ export default function AddTransactionDialog({
                 <Select
                   onValueChange={(value) => {
                     field.onChange(value as TransactionType);
-                    // setSelectedType(value as TransactionType); // Not strictly needed if `watch` is used
-                    setValue('category', ''); // Reset category when type changes
+                    setValue('category', ''); 
                   }}
                   defaultValue={field.value}
                 >
@@ -202,7 +197,7 @@ export default function AddTransactionDialog({
                 render={({ field }) => (
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    defaultValue={field.value} // Ensures this is controlled by react-hook-form
                   >
                     <SelectTrigger id="currency">
                       <SelectValue placeholder="Select currency" />
@@ -218,7 +213,6 @@ export default function AddTransactionDialog({
             </div>
           </div>
           
-
           <div>
             <Label htmlFor="category">Category</Label>
              <Controller
@@ -227,8 +221,8 @@ export default function AddTransactionDialog({
               render={({ field }) => (
                 <Select
                   onValueChange={field.onChange}
-                  value={field.value} // Ensure value is controlled
-                  key={currentType} // Force re-render when type changes
+                  value={field.value} 
+                  key={currentType} 
                 >
                   <SelectTrigger id="category">
                     <SelectValue placeholder={`Select ${currentType} category`} />
