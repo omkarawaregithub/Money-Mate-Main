@@ -1,7 +1,8 @@
 // src/components/moneymate/AppHeader.tsx
 "use client";
 
-import { Landmark, UserCircle } from 'lucide-react';
+import Link from 'next/link';
+import { Landmark, UserCircle, Settings, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -22,7 +23,9 @@ export default function AppHeader() {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <Landmark className="h-8 w-8 text-primary" />
-          <h1 className="text-2xl font-bold text-primary">MoneyMate</h1>
+          <Link href="/" className="text-2xl font-bold text-primary hover:text-primary/90 transition-colors">
+            MoneyMate
+          </Link>
         </div>
         
         <DropdownMenu>
@@ -49,9 +52,14 @@ export default function AppHeader() {
               <UserCircle className="mr-2 h-4 w-4" />
               <span>Profile</span>
             </DropdownMenuItem>
+            <DropdownMenuItem disabled>
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem disabled>
-              Log out
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Log out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
