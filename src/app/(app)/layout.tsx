@@ -24,8 +24,9 @@ import {
   // SidebarGroup,
   // SidebarGroupLabel
 } from '@/components/ui/sidebar';
-import { Landmark, LayoutDashboard, ArrowLeftRight, BarChart3, Settings, LogOut } from 'lucide-react';
+import { DollarSign, LayoutDashboard, ArrowLeftRight, BarChart3, Settings, LogOut } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 // import { Button } from '@/components/ui/button'; // Not used directly here
 import { Skeleton } from '@/components/ui/skeleton';
@@ -90,13 +91,19 @@ export default function AppLayout({
   return (
     <SidebarProvider defaultOpen> {/* Ensure defaultOpen is true or based on cookie/preference */}
       <Sidebar side="left" variant="sidebar" collapsible="icon" className="border-r">
-        <SidebarHeader className="items-center p-3">
-           <Link href="/dashboard" className="flex items-center gap-2.5 font-semibold text-lg text-sidebar-foreground group-data-[collapsible=icon]:hidden">
-              <Landmark className="h-6 w-6" />
-              <span>MoneyMate</span>
+        <SidebarHeader className="items-center p-3 justify-center"> {/* Added justify-center for collapsed logo */}
+           <Link href="/dashboard" className="flex items-center group-data-[collapsible=icon]:hidden">
+              <Image 
+                src="/moneymate-logo.png" 
+                alt="MoneyMate Logo" 
+                width={160} 
+                height={36} 
+                priority 
+                style={{ objectFit: "contain" }}
+              />
           </Link>
-          <Link href="/dashboard" className="items-center gap-2.5 font-semibold text-lg text-sidebar-foreground hidden group-data-[collapsible=icon]:flex">
-               <Landmark className="h-6 w-6" />
+          <Link href="/dashboard" className="items-center text-sidebar-foreground hidden group-data-[collapsible=icon]:flex">
+               <DollarSign className="h-6 w-6" />
                <span className="sr-only">MoneyMate</span>
           </Link>
         </SidebarHeader>
@@ -125,7 +132,7 @@ export default function AppLayout({
            <SidebarMenu>
               <SidebarMenuItem>
                   <SidebarMenuButton 
-                      className="justify-start text-sidebar-foreground/80 w-full" // Using opacity for slightly subdued text
+                      className="justify-start text-sidebar-foreground/80 hover:text-sidebar-accent-foreground hover:bg-sidebar-accent w-full" 
                       onClick={logout}
                       tooltip={{ children: "Log Out", side: "right", align:"center" }}
                   >
