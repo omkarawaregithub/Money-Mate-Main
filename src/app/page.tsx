@@ -49,7 +49,6 @@ export default function LandingPage() {
               alt="MoneyMate Dashboard Preview"
               layout="fill"
               objectFit="cover"
-              data-ai-hint="dashboard finance"
               priority
             />
           </div>

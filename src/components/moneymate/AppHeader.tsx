@@ -52,7 +52,6 @@ export default function AppHeader() {
                 <AvatarImage 
                   src={user.avatarUrl || defaultAvatar} 
                   alt={user.name} 
-                  data-ai-hint="profile avatar" 
                 />
                 <AvatarFallback>{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>

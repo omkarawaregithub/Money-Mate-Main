@@ -99,7 +99,6 @@ export default function SettingsPage() {
                     <AvatarImage 
                         src={user.avatarUrl || defaultAvatar} 
                         alt={user.name} 
-                        data-ai-hint="profile avatar large"
                     />
                     <AvatarFallback>{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                 </Avatar>
