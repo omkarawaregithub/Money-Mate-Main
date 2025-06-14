@@ -1,4 +1,3 @@
-
 // src/app/(app)/dashboard/page.tsx
 "use client";
 
@@ -13,21 +12,15 @@ export default function DashboardPage() {
   } = useTransactions();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold tracking-tight text-foreground">
+        Dashboard
+      </h1>
       <DashboardSummary
         totalIncome={totalIncome}
         totalExpenses={totalExpenses}
         balance={balance}
       />
-      {/* 
-        The following sections have been removed as per the request:
-        - Overview title and Add Transaction button
-        - Recent Transactions list
-        - Quick Report section
-        
-        These functionalities are available on other dedicated pages 
-        (e.g., Transactions page for adding/viewing transactions, Reports page for reports).
-      */}
     </div>
   );
 }
