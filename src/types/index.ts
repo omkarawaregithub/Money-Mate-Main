@@ -14,6 +14,7 @@ export interface Transaction {
 export interface UserProfile { // Basic user profile for now
   name: string;
   email: string;
+  avatarUrl?: string; // Optional field for user's avatar image URL
 }
 
 export const incomeCategories = [

@@ -26,13 +26,15 @@ export default function AppHeader() {
     // This shouldn't happen if AppLayout correctly protects routes,
     // but as a fallback:
     return (
-       <header className="py-4 px-4 sm:px-6 lg:px-8 shadow-md bg-card sticky top-0 z-40 border-b">
-        <div className="max-w-full mx-auto flex items-center justify-between h-10">
+       <header className="py-3 px-4 sm:px-6 lg:px-8 shadow-md bg-card sticky top-0 z-40 border-b">
+        <div className="max-w-full mx-auto flex items-center justify-between h-12">
             {/* Placeholder or loading state */}
         </div>
       </header>
     );
   }
+
+  const defaultAvatar = "https://placehold.co/100x100.png";
 
   return (
     <header className="py-3 px-4 sm:px-6 lg:px-8 shadow-sm bg-card sticky top-0 z-40 border-b">
@@ -47,7 +49,11 @@ export default function AppHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar className="h-10 w-10 border-2 border-primary/50">
-                <AvatarImage src="https://placehold.co/100x100.png" alt={user.name} data-ai-hint="profile avatar" />
+                <AvatarImage 
+                  src={user.avatarUrl || defaultAvatar} 
+                  alt={user.name} 
+                  data-ai-hint="profile avatar" 
+                />
                 <AvatarFallback>{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>
             </Button>

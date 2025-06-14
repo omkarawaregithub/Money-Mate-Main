@@ -17,6 +17,7 @@ import * as z from 'zod';
 const profileSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters."),
     email: z.string().email("Invalid email address."),
+    // avatarUrl: z.string().url("Invalid URL for avatar.").optional().or(z.literal('')), // Add if you want to edit avatar URL via form
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -42,6 +43,7 @@ export default function SettingsPage() {
     defaultValues: {
       name: user?.name || "",
       email: user?.email || "",
+      // avatarUrl: user?.avatarUrl || "",
     },
   });
 
@@ -56,7 +58,8 @@ export default function SettingsPage() {
 
   const onProfileSubmit: SubmitHandler<ProfileFormValues> = (data) => {
     // Simulate updating user profile
-    login(data.email, data.name); // Re-use login to update user in AuthContext
+    // If avatarUrl were part of the form: login(data.email, data.name, data.avatarUrl);
+    login(data.email, data.name); // Re-use login to update user in AuthContext, avatarUrl remains unchanged by this form
     toast({ title: "Profile Updated", description: "Your profile details have been saved." });
   };
 
@@ -72,6 +75,8 @@ export default function SettingsPage() {
     return <p>Loading user settings...</p>;
   }
 
+  const defaultAvatar = "https://placehold.co/100x100.png";
+
   return (
     <div className="space-y-8 max-w-3xl mx-auto">
       <Card>
@@ -82,7 +87,11 @@ export default function SettingsPage() {
         <CardContent className="space-y-6">
             <div className="flex items-center space-x-4">
                 <Avatar className="h-20 w-20">
-                    <AvatarImage src="https://placehold.co/100x100.png" alt={user.name} data-ai-hint="profile avatar large" />
+                    <AvatarImage 
+                        src={user.avatarUrl || defaultAvatar} 
+                        alt={user.name} 
+                        data-ai-hint="profile avatar large" 
+                    />
                     <AvatarFallback>{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div>
@@ -102,6 +111,14 @@ export default function SettingsPage() {
                     <Input id="email" type="email" {...profileForm.register('email')} />
                      {profileForm.formState.errors.email && <p className="text-sm text-destructive mt-1">{profileForm.formState.errors.email.message}</p>}
                 </div>
+                {/* 
+                // Uncomment to add Avatar URL to the form
+                <div>
+                    <Label htmlFor="avatarUrl">Avatar URL (Optional)</Label>
+                    <Input id="avatarUrl" {...profileForm.register('avatarUrl')} placeholder="https://example.com/avatar.png" />
+                    {profileForm.formState.errors.avatarUrl && <p className="text-sm text-destructive mt-1">{profileForm.formState.errors.avatarUrl.message}</p>}
+                </div>
+                */}
                  <Button type="submit" disabled={profileForm.formState.isSubmitting}>
                     {profileForm.formState.isSubmitting ? "Saving..." : "Save Profile"}
                 </Button>

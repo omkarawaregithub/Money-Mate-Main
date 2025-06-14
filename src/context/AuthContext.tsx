@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 interface AuthContextType {
   isAuthenticated: boolean;
   user: UserProfile | null;
-  login: (email: string, name?: string) => void;
+  login: (email: string, name?: string, avatarUrl?: string) => void;
   logout: () => void;
   loading: boolean;
 }
@@ -39,8 +39,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, []);
 
-  const login = (email: string, name: string = "Demo User") => {
-    const mockUser: UserProfile = { name, email };
+  const login = (email: string, name: string = "Demo User", avatarUrl?: string) => {
+    const mockUser: UserProfile = { name, email, avatarUrl };
     try {
       localStorage.setItem(MOCK_USER_KEY, JSON.stringify(mockUser));
       setUser(mockUser);
