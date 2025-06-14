@@ -6,6 +6,7 @@ import useTransactions from '@/hooks/useTransactions';
 import DashboardSummary from '@/components/moneymate/DashboardSummary';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { LayoutDashboard } from 'lucide-react';
+import { useAppSettingsContext } from '@/context/AppSettingsContext';
 
 export default function DashboardPage() {
   const { 
@@ -13,6 +14,7 @@ export default function DashboardPage() {
     totalExpenses, 
     balance 
   } = useTransactions();
+  const { appSettings } = useAppSettingsContext();
 
   return (
     <div className="space-y-6">
@@ -22,14 +24,16 @@ export default function DashboardPage() {
             <LayoutDashboard className="h-8 w-8 text-primary" />
             <div>
               <CardTitle className="text-2xl font-semibold">Dashboard Overview</CardTitle>
-              <CardDescription>A quick glance at your financial health.</CardDescription>
+              <CardDescription>
+                A quick glance at your financial health. Figures are shown in your selected global currency ({appSettings.currency}).
+              </CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            Here's a summary of your total income, expenses, and current balance. 
-            Use the sidebar to navigate to other sections like adding transactions or viewing detailed reports.
+            This summary reflects totals for transactions matching your global currency setting ({appSettings.currency}). 
+            Change your global currency in Settings to see summaries for a different currency.
           </p>
         </CardContent>
       </Card>

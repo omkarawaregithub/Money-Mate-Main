@@ -22,7 +22,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
 interface ReportsSectionProps {
-  transactions: Transaction[];
+  transactions: Transaction[]; // These are already processed transactions from useTransactions
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC0CB', '#A52A2A'];
@@ -31,9 +31,9 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'
 export default function ReportsSection({ transactions }: ReportsSectionProps) {
   const { toast } = useToast();
   const { appSettings } = useAppSettingsContext();
-  const globalAppCurrency = appSettings.currency; // Use the global app currency for filtering reports
+  const globalAppCurrency = appSettings.currency; 
 
-  // Filter transactions to include only those matching the global app currency
+  // Filter transactions to include only those matching the global app currency for report display
   const relevantTransactions = transactions.filter(t => t.currency === globalAppCurrency);
 
   const expenseTransactions = relevantTransactions.filter(t => t.type === 'expense');
@@ -52,11 +52,11 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
   ];
 
   const handleDownloadReport = () => {
+    // For CSV download, we use ALL transactions, regardless of the global currency filter used for visual reports.
     if (transactions.length === 0) {
-        toast({ variant: "destructive", title: "No Data", description: "No transactions to download." });
+        toast({ variant: "destructive", title: "No Data", description: "No transactions available to download." });
         return;
     }
-    // CSV download includes all transactions, regardless of global currency filter for reports
     const headers = "ID,Date,Type,Category,Description,Amount,Currency\n";
     const csvContent = transactions.map(t => 
       `${t.id},${t.date},${t.type},${t.category},"${(t.description || '').replace(/"/g, '""')}",${t.amount},${t.currency}`
@@ -67,12 +67,12 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
       link.setAttribute("href", url);
-      link.setAttribute("download", `moneymate_report_${globalAppCurrency}.csv`);
+      link.setAttribute("download", `moneymate_transactions_all_currencies.csv`);
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      toast({ title: "Report Downloaded", description: `CSV report (for all currencies) generated.`});
+      toast({ title: "Report Downloaded", description: `CSV report of all transactions generated.`});
     } else {
        toast({ variant: "destructive", title: "Download Failed", description: "Your browser does not support this feature."});
     }
@@ -82,23 +82,23 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
   return (
     <Card className="shadow-lg">
       <CardHeader>
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <div>
                 <CardTitle className="text-xl font-headline flex items-center">
                 <BarChart className="mr-2 h-6 w-6 text-primary" />
-                Financial Reports (in {globalAppCurrency})
+                Financial Summary ({globalAppCurrency})
                 </CardTitle>
-                <CardDescription>Visualize your income and expenses for transactions in {globalAppCurrency}.</CardDescription>
+                <CardDescription>Visualizing transactions recorded in {globalAppCurrency}.</CardDescription>
             </div>
             <Button onClick={handleDownloadReport} variant="outline" size="sm" disabled={transactions.length === 0}>
                 <Download className="mr-2 h-4 w-4" />
-                Download CSV
+                Download All (CSV)
             </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {relevantTransactions.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">No data available in {globalAppCurrency} to generate reports.</p>
+          <p className="text-muted-foreground text-center py-8">No data available in {globalAppCurrency} to generate reports. You may have transactions in other currencies.</p>
         ) : (
           <>
             <div>
@@ -122,7 +122,7 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
                   </RechartsBarChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="text-muted-foreground text-center text-sm py-4">Not enough data for Income vs Expenses chart in {globalAppCurrency}.</p>
+                <p className="text-muted-foreground text-center text-sm py-4">Not enough income/expense data in {globalAppCurrency} for this chart.</p>
               )}
             </div>
 
@@ -153,7 +153,7 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
                 </ResponsiveContainer>
             </div>
             )}
-            {expenseChartData.length === 0 && relevantTransactions.length > 0 && (
+            {expenseChartData.length === 0 && relevantTransactions.length > 0 && ( // Only show this if there are relevant (same currency) transactions but no expenses among them
                  <p className="text-muted-foreground text-center text-sm py-4">No expenses recorded in {globalAppCurrency} to show category breakdown.</p>
             )}
           </>

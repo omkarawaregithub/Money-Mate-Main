@@ -37,14 +37,15 @@ export default function useTransactions(initialTransactionsFromProp: Transaction
     
     const migrated = localStorageTransactions.map(tx => {
       if (typeof tx !== 'object' || tx === null || !tx.id) {
-        // Return null for malformed entries so they can be filtered out
         return null;
       }
+      // Ensure currency is valid, otherwise default it
       if (!tx.currency || (typeof tx.currency === 'string' && !['USD', 'INR'].includes(tx.currency as Currency))) {
         return { ...tx, currency: defaultCurrencyForMigration };
       }
       return tx;
-    }).filter(Boolean) as Transaction[]; // filter(Boolean) removes any null entries
+    }).filter(Boolean) as Transaction[]; // filter(Boolean) removes any null entries from malformed data
+    
     setProcessedTransactions(migrated);
   }, [localStorageTransactions]);
 
@@ -102,13 +103,13 @@ export default function useTransactions(initialTransactionsFromProp: Transaction
   const balance = totalIncome - totalExpenses;
   
   return {
-    transactions: processedTransactions,
+    transactions: processedTransactions, // Return the migrated and processed transactions
     addTransaction,
     deleteTransaction,
     updateTransaction,
     totalIncome,
     totalExpenses,
     balance,
-    setTransactions: setLocalStorageTransactions,
+    setTransactions: setLocalStorageTransactions, // This allows direct manipulation if ever needed, though typically not used
   };
 }
