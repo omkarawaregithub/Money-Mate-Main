@@ -35,7 +35,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"; // Removed AlertDialogTrigger as it's used with asChild
+  AlertDialogTrigger, // Added AlertDialogTrigger back
+} from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
 
 
