@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/sidebar';
 import { DollarSign, LayoutDashboard, ArrowLeftRight, BarChart3, Settings, LogOut } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
+// import Image from 'next/image'; // Image import removed
 import { usePathname } from 'next/navigation';
 // import { Button } from '@/components/ui/button'; // Not used directly here
 import { Skeleton } from '@/components/ui/skeleton';
@@ -36,7 +36,7 @@ export default function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, loading, logout } = useAuth(); // Removed 'user' as it's not directly used here
+  const { isAuthenticated, loading, logout } = useAuth(); 
   const router = useRouter();
   const pathname = usePathname();
 
@@ -48,7 +48,7 @@ export default function AppLayout({
 
   if (loading) {
     return (
-      <div className="flex min-h-screen"> {/* Simplified skeleton for loading state */}
+      <div className="flex min-h-screen"> 
         <div className="w-64 bg-card p-4 hidden md:block border-r">
           <Skeleton className="h-10 w-32 mb-6" />
           <Skeleton className="h-8 w-full mb-3" />
@@ -76,8 +76,6 @@ export default function AppLayout({
   }
 
   if (!isAuthenticated) {
-    // This state should ideally not be reached due to the useEffect redirect,
-    // but it's a fallback. Returning null avoids rendering the layout for unauthenticated users.
     return null; 
   }
   
@@ -89,18 +87,12 @@ export default function AppLayout({
   ];
 
   return (
-    <SidebarProvider defaultOpen> {/* Ensure defaultOpen is true or based on cookie/preference */}
+    <SidebarProvider defaultOpen> 
       <Sidebar side="left" variant="sidebar" collapsible="icon" className="border-r">
-        <SidebarHeader className="items-center p-3 justify-center"> {/* Added justify-center for collapsed logo */}
+        <SidebarHeader className="items-center p-3 justify-center">
            <Link href="/dashboard" className="flex items-center group-data-[collapsible=icon]:hidden">
-              <Image 
-                src="/moneymate-logo.png" 
-                alt="MoneyMate Logo" 
-                width={160} 
-                height={36} 
-                priority 
-                style={{ objectFit: "contain" }}
-              />
+              <DollarSign className="h-7 w-7 text-primary mr-2" /> 
+              <span className="text-xl font-bold text-primary">MoneyMate</span>
           </Link>
           <Link href="/dashboard" className="items-center text-sidebar-foreground hidden group-data-[collapsible=icon]:flex">
                <DollarSign className="h-6 w-6" />
@@ -108,7 +100,7 @@ export default function AppLayout({
           </Link>
         </SidebarHeader>
         
-        <SidebarContent className="p-2 flex-1"> {/* Use flex-1 to push footer down */}
+        <SidebarContent className="p-2 flex-1"> 
           <SidebarMenu>
             {navItems.map((item) => (
               <SidebarMenuItem key={item.href}>
@@ -144,9 +136,9 @@ export default function AppLayout({
         </SidebarFooter>
       </Sidebar>
 
-      <SidebarInset className="flex flex-col bg-background"> {/* Ensure SidebarInset handles its background */}
+      <SidebarInset className="flex flex-col bg-background"> 
           <AppHeader />
-          <main className="flex-grow p-4 sm:p-6 lg:p-8 overflow-y-auto"> {/* Ensure main content can scroll */}
+          <main className="flex-grow p-4 sm:p-6 lg:p-8 overflow-y-auto"> 
                {children}
           </main>
            <footer className="py-4 text-center text-xs text-muted-foreground border-t bg-card shrink-0">

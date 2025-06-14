@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
 interface ReportsSectionProps {
-  transactions: Transaction[]; // These are ALL processed transactions from useTransactions
+  transactions: Transaction[]; 
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC0CB', '#A52A2A'];
@@ -34,11 +34,10 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
   const { appSettings } = useAppSettingsContext();
   const globalAppCurrency = appSettings.currency; 
 
-  // Use all transactions for reports
   const expenseTransactions = transactions.filter(t => t.type === 'expense');
   const incomeTransactions = transactions.filter(t => t.type === 'income');
 
-  const expensesByCategory = groupTransactionsByCategory(expenseTransactions); // Groups all expenses
+  const expensesByCategory = groupTransactionsByCategory(expenseTransactions); 
 
   const expenseChartData = Object.entries(expensesByCategory)
     .map(([name, value]) => ({ name, value }))
@@ -88,7 +87,7 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
                 </CardTitle>
                 <CardDescription>
                   Visualizing all transactions. Values displayed in charts use your global currency setting ({globalAppCurrency}) for formatting.
-                  Note: If transactions exist in multiple currencies, chart values are direct aggregates of amounts.
+                  Note: Chart values are direct aggregates of amounts, irrespective of original transaction currency.
                 </CardDescription>
             </div>
             <Button onClick={handleDownloadReport} variant="outline" size="sm" disabled={transactions.length === 0}>
@@ -163,4 +162,3 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
     </Card>
   );
 }
-
