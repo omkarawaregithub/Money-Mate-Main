@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/context/AuthContext';
+import { AppSettingsProvider } from '@/context/AppSettingsContext';
 
 export const metadata: Metadata = {
   title: 'MoneyMate - Expense Tracker',
@@ -23,8 +24,10 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased min-h-screen flex flex-col bg-background">
         <AuthProvider>
-          {children}
-          <Toaster />
+          <AppSettingsProvider>
+            {children}
+            <Toaster />
+          </AppSettingsProvider>
         </AuthProvider>
       </body>
     </html>

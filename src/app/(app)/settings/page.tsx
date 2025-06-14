@@ -3,12 +3,15 @@
 "use client";
 
 import { useAuth } from '@/context/AuthContext';
+import { useAppSettingsContext } from '@/context/AppSettingsContext';
+import type { Currency } from '@/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from '@/hooks/use-toast';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -35,7 +38,8 @@ type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 
 export default function SettingsPage() {
-  const { user, login, logout } = useAuth(); // `login` can be used to update user details in this mock
+  const { user, login, logout } = useAuth();
+  const { appSettings, updateCurrency } = useAppSettingsContext();
   const { toast } = useToast();
 
   const profileForm = useForm<ProfileFormValues>({
@@ -59,7 +63,7 @@ export default function SettingsPage() {
   const onProfileSubmit: SubmitHandler<ProfileFormValues> = (data) => {
     // Simulate updating user profile
     // If avatarUrl were part of the form: login(data.email, data.name, data.avatarUrl);
-    login(data.email, data.name); // Re-use login to update user in AuthContext, avatarUrl remains unchanged by this form
+    login(data.email, data.name, user?.avatarUrl); // Preserve avatar if not editable here
     toast({ title: "Profile Updated", description: "Your profile details have been saved." });
   };
 
@@ -68,6 +72,11 @@ export default function SettingsPage() {
     console.log("Password change data:", data); // In a real app, this would hit an API
     toast({ title: "Password Changed", description: "Your password has been updated (simulated)." });
     passwordForm.reset();
+  };
+
+  const handleCurrencyChange = (value: string) => {
+    updateCurrency(value as Currency);
+    toast({ title: "Currency Updated", description: `Currency set to ${value}.` });
   };
 
 
@@ -90,7 +99,7 @@ export default function SettingsPage() {
                     <AvatarImage 
                         src={user.avatarUrl || defaultAvatar} 
                         alt={user.name} 
-                        data-ai-hint="profile avatar large" 
+                        data-ai-hint="profile avatar large"
                     />
                     <AvatarFallback>{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                 </Avatar>
@@ -155,6 +164,32 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
       
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl">App Settings</CardTitle>
+          <CardDescription>Customize your app experience.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label className="mb-2 block">Currency</Label>
+            <RadioGroup
+              defaultValue={appSettings.currency}
+              onValueChange={handleCurrencyChange}
+              className="flex space-x-4"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="USD" id="usd" />
+                <Label htmlFor="usd">USD ($)</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="INR" id="inr" />
+                <Label htmlFor="inr">INR (₹)</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
             <CardTitle className="text-2xl text-destructive">Account Actions</CardTitle>

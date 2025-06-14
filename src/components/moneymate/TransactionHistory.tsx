@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import type { Transaction } from '@/types';
 import { formatCurrency, formatDate, getCategoryLabel } from '@/lib/transactionUtils';
+import { useAppSettingsContext } from '@/context/AppSettingsContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
   Table,
@@ -15,11 +16,10 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Trash2, Edit3, ArrowDownUp, CalendarDays, ListFilter } from 'lucide-react';
+import { Trash2, Edit3, ArrowDownUp, ListFilter } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -35,8 +35,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "@/components/ui/alert-dialog"; // Removed AlertDialogTrigger as it's used with asChild
 import { useToast } from '@/hooks/use-toast';
 
 
@@ -48,6 +47,8 @@ interface TransactionHistoryProps {
 
 export default function TransactionHistory({ transactions, onEditTransaction, onDeleteTransaction }: TransactionHistoryProps) {
   const { toast } = useToast();
+  const { appSettings } = useAppSettingsContext();
+  const { currency } = appSettings;
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc'); // 'desc' for newest first
 
@@ -133,7 +134,7 @@ export default function TransactionHistory({ transactions, onEditTransaction, on
                     </Badge>
                   </TableCell>
                   <TableCell className={`text-right font-semibold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                    {formatCurrency(transaction.amount)}
+                    {formatCurrency(transaction.amount, currency)}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" onClick={() => onEditTransaction(transaction)} className="mr-1 hover:text-primary">

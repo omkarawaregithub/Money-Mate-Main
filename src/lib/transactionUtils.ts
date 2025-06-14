@@ -1,11 +1,12 @@
 // src/lib/transactionUtils.ts
-import type { Transaction } from '@/types';
+import type { Transaction, Currency } from '@/types';
 import { format, parseISO } from 'date-fns';
 
-export function formatCurrency(amount: number, currency = 'USD'): string {
-  return new Intl.NumberFormat('en-US', {
+export function formatCurrency(amount: number, currencyCode: Currency): string {
+  const locale = currencyCode === 'INR' ? 'en-IN' : 'en-US';
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
-    currency: currency,
+    currency: currencyCode,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);

@@ -42,3 +42,9 @@ export const expenseCategories = [
 
 export type IncomeCategory = typeof incomeCategories[number]['value'];
 export type ExpenseCategory = typeof expenseCategories[number]['value'];
+
+export type Currency = 'USD' | 'INR';
+
+export interface AppSettings {
+  currency: Currency;
+}

@@ -4,6 +4,7 @@
 import type { Transaction } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { BarChart, PieChartIcon, Download } from 'lucide-react';
+import { useAppSettingsContext } from '@/context/AppSettingsContext';
 import {
   ResponsiveContainer,
   Bar,
@@ -29,12 +30,14 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'
 
 export default function ReportsSection({ transactions }: ReportsSectionProps) {
   const { toast } = useToast();
+  const { appSettings } = useAppSettingsContext();
+  const { currency } = appSettings;
 
   const expenseTransactions = transactions.filter(t => t.type === 'expense');
   const incomeTransactions = transactions.filter(t => t.type === 'income');
 
   const expensesByCategory = groupTransactionsByCategory(expenseTransactions);
-  const incomeByCategory = groupTransactionsByCategory(incomeTransactions);
+  // const incomeByCategory = groupTransactionsByCategory(incomeTransactions); // Not currently used in charts
 
   const expenseChartData = Object.entries(expensesByCategory)
     .map(([name, value]) => ({ name, value }))
@@ -50,7 +53,7 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
     // Basic CSV download functionality
     const headers = "ID,Date,Type,Category,Description,Amount\n";
     const csvContent = transactions.map(t => 
-      `${t.id},${t.date},${t.type},${t.category},${t.description || ''},${t.amount}`
+      `${t.id},${t.date},${t.type},${t.category},"${(t.description || '').replace(/"/g, '""')}",${t.amount}`
     ).join("\n");
     
     const blob = new Blob([headers + csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -98,12 +101,16 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
                 <ResponsiveContainer width="100%" height={250}>
                   <RechartsBarChart data={incomeExpenseChartData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
                     <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                    <YAxis tickFormatter={(value) => formatCurrency(value, '').slice(1)} tick={{ fontSize: 10 }} width={50}/>
-                    <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                    <YAxis 
+                        tickFormatter={(value) => formatCurrency(value, currency).replace(/[^0-9.,]/g, '')} // Basic strip of currency symbol for axis
+                        tick={{ fontSize: 10 }} 
+                        width={currency === 'INR' ? 60 : 50} // Slightly wider for INR amounts
+                    />
+                    <Tooltip formatter={(value: number) => formatCurrency(value, currency)} />
                     <Legend wrapperStyle={{ fontSize: '12px' }} />
                     <Bar dataKey="value" name="Amount" >
                        {incomeExpenseChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.name === 'Total Income' ? '#00C49F' : '#FF8042'} />
+                        <Cell key={`cell-${index}`} fill={entry.name === 'Total Income' ? 'hsl(var(--chart-2))' : 'hsl(var(--chart-5))'} />
                       ))}
                     </Bar>
                   </RechartsBarChart>
@@ -134,7 +141,7 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: number, name: string) => [`${formatCurrency(value)}`, name]}/>
+                    <Tooltip formatter={(value: number, name: string) => [`${formatCurrency(value, currency)}`, name]}/>
                     <Legend wrapperStyle={{ fontSize: '10px', marginTop: '10px' }} layout="horizontal" verticalAlign="bottom" align="center" />
                   </RechartsPieChart>
                 </ResponsiveContainer>

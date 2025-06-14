@@ -2,8 +2,9 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowDownCircle, ArrowUpCircle, DollarSign, TrendingUp, TrendingDown, Banknote } from 'lucide-react';
+import { TrendingUp, TrendingDown, Banknote } from 'lucide-react';
 import { formatCurrency } from '@/lib/transactionUtils';
+import { useAppSettingsContext } from '@/context/AppSettingsContext';
 
 interface DashboardSummaryProps {
   totalIncome: number;
@@ -12,6 +13,9 @@ interface DashboardSummaryProps {
 }
 
 export default function DashboardSummary({ totalIncome, totalExpenses, balance }: DashboardSummaryProps) {
+  const { appSettings } = useAppSettingsContext();
+  const { currency } = appSettings;
+
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -20,7 +24,7 @@ export default function DashboardSummary({ totalIncome, totalExpenses, balance }
           <TrendingUp className="h-5 w-5 text-green-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold text-green-600">{formatCurrency(totalIncome)}</div>
+          <div className="text-3xl font-bold text-green-600">{formatCurrency(totalIncome, currency)}</div>
           <p className="text-xs text-muted-foreground mt-1">All earnings recorded</p>
         </CardContent>
       </Card>
@@ -31,7 +35,7 @@ export default function DashboardSummary({ totalIncome, totalExpenses, balance }
           <TrendingDown className="h-5 w-5 text-red-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold text-red-600">{formatCurrency(totalExpenses)}</div>
+          <div className="text-3xl font-bold text-red-600">{formatCurrency(totalExpenses, currency)}</div>
           <p className="text-xs text-muted-foreground mt-1">All spendings recorded</p>
         </CardContent>
       </Card>
@@ -43,7 +47,7 @@ export default function DashboardSummary({ totalIncome, totalExpenses, balance }
         </CardHeader>
         <CardContent>
           <div className={`text-3xl font-bold ${balance >= 0 ? 'text-primary' : 'text-destructive'}`}>
-            {formatCurrency(balance)}
+            {formatCurrency(balance, currency)}
           </div>
           <p className="text-xs text-muted-foreground mt-1">Your financial standing</p>
         </CardContent>
