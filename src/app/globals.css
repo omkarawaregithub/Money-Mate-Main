@@ -40,14 +40,14 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     
-    /* Updated Sidebar Colors - Light Theme */
-    --sidebar-background: 210 25% 98%; /* Slightly off-white, cool gray */
-    --sidebar-foreground: 210 12% 35%; /* Darker gray text for contrast */
-    --sidebar-primary: hsl(var(--primary)); /* Active item background - uses main primary */
+    /* Updated Sidebar Colors - Light Theme - Modern & Classy */
+    --sidebar-background: 220 30% 97%;      /* Very light cool gray/off-white */
+    --sidebar-foreground: 220 10% 30%;      /* Dark cool gray */
+    --sidebar-primary: hsl(var(--primary));  /* Active item background - uses main primary */
     --sidebar-primary-foreground: hsl(var(--primary-foreground)); /* Active item text */
-    --sidebar-accent: 210 30% 94%;      /* Hover item background - subtle cool gray */
+    --sidebar-accent: 220 30% 92%;          /* Hover item background - slightly darker light cool gray */
     --sidebar-accent-foreground: hsl(var(--primary)); /* Hover item text - primary color */
-    --sidebar-border: 210 20% 90%;      /* Subtle border */
+    --sidebar-border: 220 20% 90%;          /* Subtle border */
     --sidebar-ring: hsl(var(--ring));
   }
 
@@ -80,14 +80,14 @@
     --input: 210 10% 30%;
     --ring: 210 75% 55%;
     
-    /* Updated Sidebar Colors - Dark Theme */
-    --sidebar-background: 210 10% 12%; /* Darker than main dark bg for depth */
-    --sidebar-foreground: 210 20% 85%; /* Lighter gray text */
-    --sidebar-primary: hsl(var(--primary)); /* Active item background */
+    /* Updated Sidebar Colors - Dark Theme - Modern & Classy */
+    --sidebar-background: 220 15% 18%;      /* Dark slate/charcoal, cool tone */
+    --sidebar-foreground: 220 15% 75%;      /* Light cool gray, not pure white */
+    --sidebar-primary: hsl(var(--primary));  /* Active item background */
     --sidebar-primary-foreground: hsl(var(--primary-foreground)); /* Active item text */
-    --sidebar-accent: 210 10% 20%;      /* Hover item background - matches card bg */
+    --sidebar-accent: 220 15% 25%;          /* Hover item background - slightly lighter dark slate */
     --sidebar-accent-foreground: hsl(var(--primary)); /* Hover item text - primary color */
-    --sidebar-border: 210 10% 18%;      /* Subtle border */
+    --sidebar-border: 220 15% 22%;          /* Subtle border */
     --sidebar-ring: hsl(var(--ring));
   }
 }

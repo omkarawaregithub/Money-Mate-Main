@@ -91,11 +91,11 @@ export default function AppLayout({
     <SidebarProvider defaultOpen> {/* Ensure defaultOpen is true or based on cookie/preference */}
       <Sidebar side="left" variant="sidebar" collapsible="icon" className="border-r">
         <SidebarHeader className="items-center p-3">
-           <Link href="/dashboard" className="flex items-center gap-2.5 font-semibold text-lg text-sidebar-primary group-data-[collapsible=icon]:hidden">
+           <Link href="/dashboard" className="flex items-center gap-2.5 font-semibold text-lg text-sidebar-foreground group-data-[collapsible=icon]:hidden">
               <Landmark className="h-6 w-6" />
               <span>MoneyMate</span>
           </Link>
-          <Link href="/dashboard" className="items-center gap-2.5 font-semibold text-lg text-sidebar-primary hidden group-data-[collapsible=icon]:flex">
+          <Link href="/dashboard" className="items-center gap-2.5 font-semibold text-lg text-sidebar-foreground hidden group-data-[collapsible=icon]:flex">
                <Landmark className="h-6 w-6" />
                <span className="sr-only">MoneyMate</span>
           </Link>
@@ -125,8 +125,7 @@ export default function AppLayout({
            <SidebarMenu>
               <SidebarMenuItem>
                   <SidebarMenuButton 
-                      variant="ghost" 
-                      className="justify-start text-muted-foreground hover:text-sidebar-foreground w-full"
+                      className="justify-start text-sidebar-foreground/80 w-full" // Using opacity for slightly subdued text
                       onClick={logout}
                       tooltip={{ children: "Log Out", side: "right", align:"center" }}
                   >
