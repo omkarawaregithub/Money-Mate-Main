@@ -43,16 +43,7 @@ export default function LandingPage() {
               <Link href="#features">Learn More</Link>
             </Button>
           </div>
-          <div className="mt-16 relative aspect-[16/9] max-w-4xl mx-auto rounded-xl shadow-2xl overflow-hidden">
-            <Image 
-              src="https://placehold.co/1200x675.png" 
-              alt="MoneyMate app preview: financial dashboard and charts"
-              data-ai-hint="finance app"
-              layout="fill"
-              objectFit="cover"
-              priority
-            />
-          </div>
+          {/* The large placeholder image section below has been removed */}
         </section>
 
         <section id="features" className="py-16 sm:py-24">
