@@ -1,4 +1,5 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/generate-encouragement-message.ts';
+// Example: import '@/ai/flows/your-flow.ts';
+// Ensure you have flows defined and imported here for Genkit dev UI to pick them up.

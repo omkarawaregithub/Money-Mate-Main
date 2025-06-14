@@ -1,104 +1,88 @@
 // src/app/page.tsx
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
-import useLocalStorage from '@/hooks/useLocalStorage';
-import { calculateNextResetDate, calculateTimeRemaining, type TimeRemaining } from '@/lib/dateUtils';
-import CountdownDisplay from '@/components/CountdownDisplay';
-import UsageVisualizer from '@/components/UsageVisualizer';
-import EncouragementEngine from '@/components/EncouragementEngine';
-import SettingsPanel from '@/components/SettingsPanel';
-import { Separator } from '@/components/ui/separator';
-import { BotIcon } from 'lucide-react'; // MoneyMate logo icon
+import { useState } from 'react';
+import useTransactions from '@/hooks/useTransactions';
+import AppHeader from '@/components/moneymate/AppHeader';
+import DashboardSummary from '@/components/moneymate/DashboardSummary';
+import AddTransactionDialog from '@/components/moneymate/AddTransactionDialog';
+import TransactionHistory from '@/components/moneymate/TransactionHistory';
+import ReportsSection from '@/components/moneymate/ReportsSection';
+import { Button } from '@/components/ui/button';
+import { PlusCircle } from 'lucide-react';
+import type { Transaction } from '@/types';
 
-const OPTIMAL_USAGE_SUGGESTIONS = "Try to make the most of each Copilot interaction. Explore batching similar queries or refining prompts for more precise answers. Remember, every query is a step towards mastery!";
 
 export default function MoneyMatePage() {
-  const [resetDay, setResetDay] = useLocalStorage<number>('moneyMate_resetDay', 1);
-  const [currentUsage, setCurrentUsage] = useState<number>(0);
-  const [totalQuota, setTotalQuota] = useState<number>(100);
+  const { 
+    transactions, 
+    addTransaction, 
+    deleteTransaction, 
+    updateTransaction, 
+    totalIncome, 
+    totalExpenses, 
+    balance 
+  } = useTransactions();
 
-  const [nextResetDate, setNextResetDate] = useState<Date | null>(null);
-  const [timeRemaining, setTimeRemaining] = useState<TimeRemaining | null>(null);
-  const [daysUntilReset, setDaysUntilReset] = useState<number>(0);
+  const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
-  const [encouragementMessage, setEncouragementMessage] = useState<string | null>(null);
-  const [isLoadingEncouragement, setIsLoadingEncouragement] = useState<boolean>(true);
-  
-  // Calculate next reset date whenever resetDay changes
-  useEffect(() => {
-    if (typeof window !== 'undefined') { // Ensure this runs client-side
-        const date = calculateNextResetDate(resetDay);
-        setNextResetDate(date);
+  const handleOpenAddTransactionDialog = (transaction?: Transaction) => {
+    if (transaction) {
+      setEditingTransaction(transaction);
+    } else {
+      setEditingTransaction(null);
     }
-  }, [resetDay]);
+    setIsAddTransactionOpen(true);
+  };
 
-  // Update countdown timer every second
-  useEffect(() => {
-    if (!nextResetDate || typeof window === 'undefined') return;
-
-    const updateTimer = () => {
-      const remaining = calculateTimeRemaining(nextResetDate);
-      setTimeRemaining(remaining);
-      if (remaining) {
-        setDaysUntilReset(remaining.days);
-         if (remaining.totalMilliseconds <= 0) {
-           // Quota has reset, recalculate next reset date for the new cycle
-           const newNextResetDate = calculateNextResetDate(resetDay);
-           setNextResetDate(newNextResetDate);
-         }
-      }
-    };
-    
-    updateTimer(); // Initial call
-    const intervalId = setInterval(updateTimer, 1000);
-    return () => clearInterval(intervalId);
-  }, [nextResetDate, resetDay]);
-
-  const remainingAllowances = useMemo(() => Math.max(0, totalQuota - currentUsage), [totalQuota, currentUsage]);
+  const handleCloseAddTransactionDialog = () => {
+    setIsAddTransactionOpen(false);
+    setEditingTransaction(null);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background font-body">
-      <header className="py-6 px-4 sm:px-6 lg:px-8 shadow-md bg-card">
-        <div className="max-w-6xl mx-auto flex items-center space-x-3">
-          <BotIcon className="h-10 w-10 text-primary" />
-          <h1 className="text-3xl font-bold font-headline text-primary">MoneyMate</h1>
-          <span className="text-sm text-muted-foreground pt-1">Your Copilot Quota Companion</span>
-        </div>
-      </header>
+      <AppHeader />
 
       <main className="flex-grow container mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Settings Panel - takes up 1/3 on large screens */}
-          <div className="lg:col-span-1 space-y-6">
-            <SettingsPanel
-              resetDay={resetDay}
-              setResetDay={setResetDay}
-              currentUsage={currentUsage}
-              setCurrentUsage={setCurrentUsage}
-              totalQuota={totalQuota}
-              setTotalQuota={setTotalQuota}
+        <DashboardSummary
+          totalIncome={totalIncome}
+          totalExpenses={totalExpenses}
+          balance={balance}
+        />
+
+        <div className="mt-8 mb-6 flex justify-end">
+          <Button onClick={() => handleOpenAddTransactionDialog()} size="lg">
+            <PlusCircle className="mr-2 h-5 w-5" />
+            Add Transaction
+          </Button>
+        </div>
+
+        <AddTransactionDialog
+          isOpen={isAddTransactionOpen}
+          onClose={handleCloseAddTransactionDialog}
+          addTransaction={addTransaction}
+          updateTransaction={updateTransaction}
+          existingTransaction={editingTransaction}
+        />
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+          <div className="md:col-span-2">
+            <TransactionHistory 
+              transactions={transactions} 
+              onEditTransaction={handleOpenAddTransactionDialog}
+              onDeleteTransaction={deleteTransaction}
             />
           </div>
-
-          {/* Main Info Panels - takes up 2/3 on large screens */}
-          <div className="lg:col-span-2 space-y-6">
-            <CountdownDisplay timeRemaining={timeRemaining} daysUntilReset={daysUntilReset} />
-            <UsageVisualizer currentUsage={currentUsage} totalQuota={totalQuota} />
-            <EncouragementEngine
-              remainingAllowances={remainingAllowances}
-              optimalUsageSuggestions={OPTIMAL_USAGE_SUGGESTIONS}
-              isLoading={isLoadingEncouragement}
-              setIsLoading={setIsLoadingEncouragement}
-              message={encouragementMessage}
-              setMessage={setEncouragementMessage}
-            />
+          <div className="md:col-span-1">
+             <ReportsSection transactions={transactions} />
           </div>
         </div>
       </main>
 
       <footer className="py-6 text-center text-muted-foreground text-sm bg-card border-t">
-        <p>&copy; {new Date().getFullYear()} MoneyMate. Stay productive!</p>
+        <p>&copy; {new Date().getFullYear()} MoneyMate. Your smart expense tracker.</p>
       </footer>
     </div>
   );
