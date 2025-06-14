@@ -41,33 +41,33 @@
     --chart-5: 27 87% 67%;
     
     /* Updated Sidebar Colors - Light Theme - Modern & Classy */
-    --sidebar-background: 220 30% 97%;      /* Very light cool gray/off-white */
-    --sidebar-foreground: 220 10% 30%;      /* Dark cool gray */
+    --sidebar-background: 220 40% 98%;      /* Very light cool gray/off-white, slightly more saturated */
+    --sidebar-foreground: 220 15% 25%;      /* Darker cool gray for better contrast */
     --sidebar-primary: hsl(var(--primary));  /* Active item background - uses main primary */
     --sidebar-primary-foreground: hsl(var(--primary-foreground)); /* Active item text */
-    --sidebar-accent: 220 30% 92%;          /* Hover item background - slightly darker light cool gray */
-    --sidebar-accent-foreground: hsl(var(--primary)); /* Hover item text - primary color */
-    --sidebar-border: 220 20% 90%;          /* Subtle border */
+    --sidebar-accent: 220 30% 92%;          /* Hover item background - subtle light cool gray */
+    --sidebar-accent-foreground: hsl(var(--primary)); /* Hover item text - primary color for pop */
+    --sidebar-border: 220 25% 90%;          /* Subtle border */
     --sidebar-ring: hsl(var(--ring));
   }
 
   .dark {
-    --background: 210 10% 15%; 
+    --background: 210 10% 10%; /* Darker background */
     --foreground: 210 20% 95%;
 
-    --card: 210 10% 20%;
+    --card: 210 10% 15%; /* Darker card */
     --card-foreground: 210 20% 95%;
 
-    --popover: 210 10% 20%;
+    --popover: 210 10% 15%; /* Darker popover */
     --popover-foreground: 210 20% 95%;
 
     --primary: 210 75% 55%;
     --primary-foreground: 210 10% 5%;
 
-    --secondary: 210 10% 25%;
+    --secondary: 210 10% 20%; /* Darker secondary */
     --secondary-foreground: 210 20% 95%;
 
-    --muted: 210 10% 30%;
+    --muted: 210 10% 25%; /* Darker muted */
     --muted-foreground: 210 20% 75%;
 
     --accent: 180 60% 45%;
@@ -76,18 +76,18 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 210 10% 30%;
-    --input: 210 10% 30%;
+    --border: 210 10% 25%; /* Darker border */
+    --input: 210 10% 25%; /* Darker input */
     --ring: 210 75% 55%;
     
     /* Updated Sidebar Colors - Dark Theme - Modern & Classy */
-    --sidebar-background: 220 15% 18%;      /* Dark slate/charcoal, cool tone */
-    --sidebar-foreground: 220 15% 75%;      /* Light cool gray, not pure white */
+    --sidebar-background: 220 20% 10%;      /* Very dark slate/charcoal, cool tone */
+    --sidebar-foreground: 220 15% 85%;      /* Light cool gray, not pure white, slightly brighter */
     --sidebar-primary: hsl(var(--primary));  /* Active item background */
     --sidebar-primary-foreground: hsl(var(--primary-foreground)); /* Active item text */
-    --sidebar-accent: 220 15% 25%;          /* Hover item background - slightly lighter dark slate */
+    --sidebar-accent: 220 15% 18%;          /* Hover item background - slightly lighter dark slate */
     --sidebar-accent-foreground: hsl(var(--primary)); /* Hover item text - primary color */
-    --sidebar-border: 220 15% 22%;          /* Subtle border */
+    --sidebar-border: 220 20% 15%;          /* Subtle border, slightly darker */
     --sidebar-ring: hsl(var(--ring));
   }
 }

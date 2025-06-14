@@ -84,7 +84,7 @@ export default function SettingsPage() {
     return <p>Loading user settings...</p>;
   }
 
-  const defaultAvatar = "https://placehold.co/100x100.png";
+  const defaultAvatar = "https://placehold.co/128x128/E0E7FF/4A5568.png?text=U";
 
   return (
     <div className="space-y-8 max-w-3xl mx-auto">

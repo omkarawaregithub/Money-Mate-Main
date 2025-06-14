@@ -4,6 +4,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/context/AuthContext';
 import { AppSettingsProvider } from '@/context/AppSettingsContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 
 export const metadata: Metadata = {
   title: 'MoneyMate - Expense Tracker',
@@ -16,17 +17,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning> {/* suppressHydrationWarning is important for theme switching */}
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-body antialiased min-h-screen flex flex-col bg-background">
+      <body className="font-body antialiased min-h-screen flex flex-col bg-background text-foreground">
         <AuthProvider>
           <AppSettingsProvider>
-            {children}
-            <Toaster />
+            <ThemeProvider> {/* Wrap with ThemeProvider */}
+              {children}
+              <Toaster />
+            </ThemeProvider>
           </AppSettingsProvider>
         </AuthProvider>
       </body>
