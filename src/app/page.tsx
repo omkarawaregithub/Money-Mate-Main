@@ -46,7 +46,8 @@ export default function LandingPage() {
           <div className="mt-16 relative aspect-[16/9] max-w-4xl mx-auto rounded-xl shadow-2xl overflow-hidden">
             <Image 
               src="https://placehold.co/1200x675.png" 
-              alt="MoneyMate Dashboard Preview"
+              alt="MoneyMate App Interface Preview - Dashboard and Charts"
+              data-ai-hint="finance dashboard"
               layout="fill"
               objectFit="cover"
               priority
