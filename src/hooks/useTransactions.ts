@@ -36,22 +36,15 @@ export default function useTransactions(initialTransactionsFromProp: Transaction
     const defaultCurrencyForMigration: Currency = 'USD'; 
     
     const migrated = localStorageTransactions.map(tx => {
-      // Ensure tx is a valid object and has an id before processing
       if (typeof tx !== 'object' || tx === null || !tx.id) {
-        // Log or handle malformed transaction data if necessary
-        // For now, we'll assume valid transactions are objects with IDs,
-        // and malformed ones might get filtered out if we added .filter(Boolean)
-        // For robustness, ensure all tx have a currency.
-        // If tx itself is fundamentally broken, it might need more specific handling or filtering.
+        // Return null for malformed entries so they can be filtered out
+        return null;
       }
-
-      // Check if currency property exists and is valid, otherwise assign default
-      // Valid currencies are 'USD' or 'INR'. Anything else gets migrated.
       if (!tx.currency || (typeof tx.currency === 'string' && !['USD', 'INR'].includes(tx.currency as Currency))) {
         return { ...tx, currency: defaultCurrencyForMigration };
       }
       return tx;
-    });
+    }).filter(Boolean) as Transaction[]; // filter(Boolean) removes any null entries
     setProcessedTransactions(migrated);
   }, [localStorageTransactions]);
 
@@ -64,7 +57,7 @@ export default function useTransactions(initialTransactionsFromProp: Transaction
         amount: newTransactionData.amount,
         date: newTransactionData.date.toISOString().split('T')[0],
         description: newTransactionData.description,
-        currency: newTransactionData.currency, // Currency is now part of newTransactionData
+        currency: newTransactionData.currency,
       };
       setLocalStorageTransactions((prevTransactions) => [newTransaction, ...prevTransactions]);
     },
@@ -91,7 +84,7 @@ export default function useTransactions(initialTransactionsFromProp: Transaction
     [setLocalStorageTransactions]
   );
 
-  const { totalIncome, totalExpenses, balance } = processedTransactions.reduce(
+  const { totalIncome, totalExpenses } = processedTransactions.reduce(
     (acc, transaction) => {
       // Only sum transactions matching the global app currency for dashboard summary
       if (transaction.currency === globalAppCurrency) {
@@ -101,11 +94,12 @@ export default function useTransactions(initialTransactionsFromProp: Transaction
           acc.totalExpenses += transaction.amount;
         }
       }
-      acc.balance = acc.totalIncome - acc.totalExpenses; // This balance is specific to globalAppCurrency
       return acc;
     },
-    { totalIncome: 0, totalExpenses: 0, balance: 0 }
+    { totalIncome: 0, totalExpenses: 0 }
   );
+  
+  const balance = totalIncome - totalExpenses;
   
   return {
     transactions: processedTransactions,
