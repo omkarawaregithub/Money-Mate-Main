@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import type { Transaction } from '@/types';
 import { formatCurrency, formatDate, getCategoryLabel } from '@/lib/transactionUtils';
-import { useAppSettingsContext } from '@/context/AppSettingsContext';
+// useAppSettingsContext is not directly needed here anymore as currency comes from transaction itself for display
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
   Table,
@@ -35,7 +35,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger, // Added AlertDialogTrigger back
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
 
@@ -48,8 +48,8 @@ interface TransactionHistoryProps {
 
 export default function TransactionHistory({ transactions, onEditTransaction, onDeleteTransaction }: TransactionHistoryProps) {
   const { toast } = useToast();
-  const { appSettings } = useAppSettingsContext();
-  const { currency } = appSettings;
+  // const { appSettings } = useAppSettingsContext(); // Not needed for display currency
+  // const { currency } = appSettings; // Each transaction has its own currency now
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc'); // 'desc' for newest first
 
@@ -135,7 +135,8 @@ export default function TransactionHistory({ transactions, onEditTransaction, on
                     </Badge>
                   </TableCell>
                   <TableCell className={`text-right font-semibold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                    {formatCurrency(transaction.amount, currency)}
+                    {/* Use transaction.currency for formatting */}
+                    {formatCurrency(transaction.amount, transaction.currency)}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" onClick={() => onEditTransaction(transaction)} className="mr-1 hover:text-primary">

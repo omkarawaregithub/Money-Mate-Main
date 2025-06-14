@@ -1,11 +1,11 @@
 // src/components/moneymate/AddTransactionDialog.tsx
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid'; // Not used here, ID generated in hook
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -30,14 +30,15 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
-import type { Transaction, TransactionType, IncomeCategory, ExpenseCategory } from '@/types';
+import type { Transaction, TransactionType, Currency, IncomeCategory, ExpenseCategory } from '@/types';
 import { incomeCategories, expenseCategories } from '@/types';
 import { useToast } from '@/hooks/use-toast';
-
+import { useAppSettingsContext } from '@/context/AppSettingsContext';
 
 const formSchema = z.object({
   type: z.enum(['income', 'expense'], { required_error: "Transaction type is required." }),
   amount: z.coerce.number().positive({ message: "Amount must be positive." }),
+  currency: z.enum(['USD', 'INR'], { required_error: "Currency is required."}),
   category: z.string().min(1, { message: "Category is required." }),
   date: z.date({ required_error: "Date is required." }),
   description: z.string().optional(),
@@ -48,6 +49,7 @@ type TransactionFormData = z.infer<typeof formSchema>;
 interface AddTransactionDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  // The type of addTransaction needs to be able to accept TransactionFormData
   addTransaction: (transaction: Omit<Transaction, 'id' | 'date'> & { date: Date }) => void;
   updateTransaction: (transaction: Transaction) => void;
   existingTransaction?: Transaction | null;
@@ -61,15 +63,17 @@ export default function AddTransactionDialog({
   existingTransaction,
 }: AddTransactionDialogProps) {
   const { toast } = useToast();
-  const [selectedType, setSelectedType] = useState<TransactionType>(existingTransaction?.type || 'expense');
+  const { appSettings } = useAppSettingsContext();
+  // const [selectedType, setSelectedType] = useState<TransactionType>(existingTransaction?.type || 'expense'); // Not directly used for category list logic
 
-  const defaultValues = useMemo(() => ({
+  const defaultValues: TransactionFormData = useMemo(() => ({
     type: existingTransaction?.type || 'expense',
     amount: existingTransaction?.amount || 0,
+    currency: existingTransaction?.currency || appSettings.currency,
     category: existingTransaction?.category || '',
     date: existingTransaction?.date ? new Date(existingTransaction.date) : new Date(),
     description: existingTransaction?.description || '',
-  }), [existingTransaction]);
+  }), [existingTransaction, appSettings.currency]);
 
   const {
     control,
@@ -87,33 +91,52 @@ export default function AddTransactionDialog({
   const currentType = watch('type', defaultValues.type);
 
   useEffect(() => {
-    if (existingTransaction) {
-        setSelectedType(existingTransaction.type);
-        reset({
-            type: existingTransaction.type,
-            amount: existingTransaction.amount,
-            category: existingTransaction.category,
-            date: new Date(existingTransaction.date),
-            description: existingTransaction.description || '',
-        });
-    } else {
-        setSelectedType('expense'); // Default for new transaction
-        reset(defaultValues);
+    if (isOpen) { // Only reset form when dialog opens or existingTransaction changes
+      if (existingTransaction) {
+          reset({
+              type: existingTransaction.type,
+              amount: existingTransaction.amount,
+              currency: existingTransaction.currency,
+              category: existingTransaction.category,
+              date: new Date(existingTransaction.date),
+              description: existingTransaction.description || '',
+          });
+      } else {
+          // For new transactions, default currency to global app setting
+          reset({
+            ...defaultValues,
+            currency: appSettings.currency, 
+            type: 'expense', // Sensible default
+            category: '' // Reset category for new
+          });
+      }
     }
-  }, [existingTransaction, reset, defaultValues]);
+  }, [existingTransaction, reset, defaultValues, isOpen, appSettings.currency]);
 
 
   const onSubmit: SubmitHandler<TransactionFormData> = (data) => {
     try {
+      // The data from the form (TransactionFormData) matches Omit<Transaction, 'id' | 'date'> & { date: Date }
+      // because formSchema has `date: z.date()` and `currency: z.enum(...)`
+      const transactionDataForHook = {
+        type: data.type,
+        amount: data.amount,
+        currency: data.currency,
+        category: data.category,
+        description: data.description,
+        date: data.date, // This is a Date object, hook expects it
+      };
+
       if (existingTransaction) {
-        updateTransaction({ ...data, id: existingTransaction.id, date: data.date.toISOString().split('T')[0] });
+        updateTransaction({ ...transactionDataForHook, id: existingTransaction.id, date: data.date.toISOString().split('T')[0] });
         toast({ title: "Success", description: "Transaction updated successfully." });
       } else {
-        addTransaction(data);
+        addTransaction(transactionDataForHook);
         toast({ title: "Success", description: "Transaction added successfully." });
       }
       onClose();
-      reset(defaultValues); // Reset to initial default values for a new form
+      // Reset to initial default values for a new form, respecting global currency for new
+      reset({...defaultValues, currency: appSettings.currency, type: 'expense', category: ''}); 
     } catch (error) {
       console.error("Failed to save transaction:", error);
       toast({ variant: "destructive", title: "Error", description: "Failed to save transaction." });
@@ -141,7 +164,7 @@ export default function AddTransactionDialog({
                 <Select
                   onValueChange={(value) => {
                     field.onChange(value as TransactionType);
-                    setSelectedType(value as TransactionType);
+                    // setSelectedType(value as TransactionType); // Not strictly needed if `watch` is used
                     setValue('category', ''); // Reset category when type changes
                   }}
                   defaultValue={field.value}
@@ -159,17 +182,42 @@ export default function AddTransactionDialog({
             {errors.type && <p className="text-sm text-destructive mt-1">{errors.type.message}</p>}
           </div>
 
-          <div>
-            <Label htmlFor="amount">Amount</Label>
-            <Input
-              id="amount"
-              type="number"
-              step="0.01"
-              {...register('amount')}
-              placeholder="0.00"
-            />
-            {errors.amount && <p className="text-sm text-destructive mt-1">{errors.amount.message}</p>}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="amount">Amount</Label>
+              <Input
+                id="amount"
+                type="number"
+                step="0.01"
+                {...register('amount')}
+                placeholder="0.00"
+              />
+              {errors.amount && <p className="text-sm text-destructive mt-1">{errors.amount.message}</p>}
+            </div>
+            <div>
+              <Label htmlFor="currency">Currency</Label>
+              <Controller
+                name="currency"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger id="currency">
+                      <SelectValue placeholder="Select currency" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="USD">USD ($)</SelectItem>
+                      <SelectItem value="INR">INR (₹)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.currency && <p className="text-sm text-destructive mt-1">{errors.currency.message}</p>}
+            </div>
           </div>
+          
 
           <div>
             <Label htmlFor="category">Category</Label>

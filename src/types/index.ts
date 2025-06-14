@@ -1,6 +1,7 @@
 // src/types/index.ts
 
 export type TransactionType = 'income' | 'expense';
+export type Currency = 'USD' | 'INR';
 
 export interface Transaction {
   id: string;
@@ -9,6 +10,7 @@ export interface Transaction {
   amount: number;
   date: string; // ISO string for simplicity, e.g., "2024-07-28"
   description?: string;
+  currency: Currency; // Added currency field for each transaction
 }
 
 export interface UserProfile { // Basic user profile for now
@@ -42,8 +44,6 @@ export const expenseCategories = [
 
 export type IncomeCategory = typeof incomeCategories[number]['value'];
 export type ExpenseCategory = typeof expenseCategories[number]['value'];
-
-export type Currency = 'USD' | 'INR';
 
 export interface AppSettings {
   currency: Currency;
