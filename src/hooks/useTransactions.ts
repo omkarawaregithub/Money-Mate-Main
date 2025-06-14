@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import type { Transaction, Currency } from '@/types';
 import useLocalStorage from './useLocalStorage';
-import { useAppSettingsContext } from '@/context/AppSettingsContext';
+// Removed useAppSettingsContext as globalAppCurrency is no longer used for filtering sums here
 
 const TRANSACTIONS_STORAGE_KEY = 'moneyMate_transactions';
 
@@ -29,22 +29,21 @@ export default function useTransactions(initialTransactionsFromProp: Transaction
     initialTransactionsFromProp
   );
   const [processedTransactions, setProcessedTransactions] = useState<Transaction[]>([]);
-  const { appSettings } = useAppSettingsContext();
-  const globalAppCurrency = appSettings.currency;
 
   useEffect(() => {
     const defaultCurrencyForMigration: Currency = 'USD'; 
     
     const migrated = localStorageTransactions.map(tx => {
       if (typeof tx !== 'object' || tx === null || !tx.id) {
-        return null;
+        return null; // Filter out malformed entries
       }
       // Ensure currency is valid, otherwise default it
-      if (!tx.currency || (typeof tx.currency === 'string' && !['USD', 'INR'].includes(tx.currency as Currency))) {
-        return { ...tx, currency: defaultCurrencyForMigration };
+      let currency = tx.currency;
+      if (!currency || (typeof currency === 'string' && !['USD', 'INR'].includes(currency as Currency))) {
+        currency = defaultCurrencyForMigration;
       }
-      return tx;
-    }).filter(Boolean) as Transaction[]; // filter(Boolean) removes any null entries from malformed data
+      return { ...tx, currency: currency as Currency };
+    }).filter(Boolean) as Transaction[]; // filter(Boolean) removes any null entries
     
     setProcessedTransactions(migrated);
   }, [localStorageTransactions]);
@@ -85,15 +84,14 @@ export default function useTransactions(initialTransactionsFromProp: Transaction
     [setLocalStorageTransactions]
   );
 
+  // Calculate totals from ALL processed transactions, regardless of their individual currency
   const { totalIncome, totalExpenses } = processedTransactions.reduce(
     (acc, transaction) => {
-      // Only sum transactions matching the global app currency for dashboard summary
-      if (transaction.currency === globalAppCurrency) {
-        if (transaction.type === 'income') {
-          acc.totalIncome += transaction.amount;
-        } else {
-          acc.totalExpenses += transaction.amount;
-        }
+      // No longer filtering by globalAppCurrency here
+      if (transaction.type === 'income') {
+        acc.totalIncome += transaction.amount;
+      } else {
+        acc.totalExpenses += transaction.amount;
       }
       return acc;
     },
@@ -103,13 +101,13 @@ export default function useTransactions(initialTransactionsFromProp: Transaction
   const balance = totalIncome - totalExpenses;
   
   return {
-    transactions: processedTransactions, // Return the migrated and processed transactions
+    transactions: processedTransactions,
     addTransaction,
     deleteTransaction,
     updateTransaction,
     totalIncome,
     totalExpenses,
     balance,
-    setTransactions: setLocalStorageTransactions, // This allows direct manipulation if ever needed, though typically not used
+    setTransactions: setLocalStorageTransactions, 
   };
 }

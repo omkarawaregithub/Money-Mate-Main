@@ -21,15 +21,17 @@ export default function ReportsPage() {
                 <div>
                     <CardTitle className="text-2xl font-semibold">Financial Reports</CardTitle>
                     <CardDescription>
-                      Dive deep into your spending and earning patterns for transactions in your selected global currency ({appSettings.currency}).
+                      Dive deep into your spending and earning patterns. Reports include all transactions,
+                      and figures are displayed using your global currency setting ({appSettings.currency}).
                     </CardDescription>
                 </div>
             </div>
         </CardHeader>
         <CardContent>
             <p className="text-muted-foreground">
-                Analyze your financial health with detailed charts. Reports are generated for transactions matching
-                your global currency setting ({appSettings.currency}).
+                Analyze your financial health with detailed charts. Reports are generated from all transactions.
+                The currency symbol ({appSettings.currency}) used for chart values is based on your global app setting.
+                Note: If transactions exist in multiple currencies, chart values are direct aggregates.
             </p>
         </CardContent>
       </Card>

@@ -25,15 +25,17 @@ export default function DashboardPage() {
             <div>
               <CardTitle className="text-2xl font-semibold">Dashboard Overview</CardTitle>
               <CardDescription>
-                A quick glance at your financial health. Figures are shown in your selected global currency ({appSettings.currency}).
+                A quick glance at your financial health. Totals include all transactions,
+                and figures are displayed using your global currency setting ({appSettings.currency}).
               </CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            This summary reflects totals for transactions matching your global currency setting ({appSettings.currency}). 
-            Change your global currency in Settings to see summaries for a different currency.
+            The summary below reflects totals from all recorded transactions. 
+            The currency symbol ({appSettings.currency}) used for display is based on your global app setting.
+            Note: If transactions exist in multiple currencies, the sums are direct aggregates.
           </p>
         </CardContent>
       </Card>

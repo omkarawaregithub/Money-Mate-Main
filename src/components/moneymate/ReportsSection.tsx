@@ -22,7 +22,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
 interface ReportsSectionProps {
-  transactions: Transaction[]; // These are already processed transactions from useTransactions
+  transactions: Transaction[]; // These are ALL processed transactions from useTransactions
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC0CB', '#A52A2A'];
@@ -33,13 +33,11 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
   const { appSettings } = useAppSettingsContext();
   const globalAppCurrency = appSettings.currency; 
 
-  // Filter transactions to include only those matching the global app currency for report display
-  const relevantTransactions = transactions.filter(t => t.currency === globalAppCurrency);
+  // Use all transactions for reports
+  const expenseTransactions = transactions.filter(t => t.type === 'expense');
+  const incomeTransactions = transactions.filter(t => t.type === 'income');
 
-  const expenseTransactions = relevantTransactions.filter(t => t.type === 'expense');
-  const incomeTransactions = relevantTransactions.filter(t => t.type === 'income');
-
-  const expensesByCategory = groupTransactionsByCategory(expenseTransactions);
+  const expensesByCategory = groupTransactionsByCategory(expenseTransactions); // Groups all expenses
 
   const expenseChartData = Object.entries(expensesByCategory)
     .map(([name, value]) => ({ name, value }))
@@ -52,7 +50,6 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
   ];
 
   const handleDownloadReport = () => {
-    // For CSV download, we use ALL transactions, regardless of the global currency filter used for visual reports.
     if (transactions.length === 0) {
         toast({ variant: "destructive", title: "No Data", description: "No transactions available to download." });
         return;
@@ -86,9 +83,9 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
             <div>
                 <CardTitle className="text-xl font-headline flex items-center">
                 <BarChart className="mr-2 h-6 w-6 text-primary" />
-                Financial Summary ({globalAppCurrency})
+                Financial Summary
                 </CardTitle>
-                <CardDescription>Visualizing transactions recorded in {globalAppCurrency}.</CardDescription>
+                <CardDescription>Visualizing all transactions. Values displayed in charts use your global currency setting ({globalAppCurrency}).</CardDescription>
             </div>
             <Button onClick={handleDownloadReport} variant="outline" size="sm" disabled={transactions.length === 0}>
                 <Download className="mr-2 h-4 w-4" />
@@ -97,12 +94,12 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        {relevantTransactions.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">No data available in {globalAppCurrency} to generate reports. You may have transactions in other currencies.</p>
+        {transactions.length === 0 ? (
+          <p className="text-muted-foreground text-center py-8">No data available to generate reports.</p>
         ) : (
           <>
             <div>
-              <h3 className="text-md font-semibold mb-2 text-center text-primary">Income vs Expenses Overview ({globalAppCurrency})</h3>
+              <h3 className="text-md font-semibold mb-2 text-center text-primary">Income vs Expenses Overview ({globalAppCurrency} display)</h3>
               {incomeExpenseChartData.some(d => d.value > 0) ? (
                 <ResponsiveContainer width="100%" height={250}>
                   <RechartsBarChart data={incomeExpenseChartData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
@@ -122,13 +119,13 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
                   </RechartsBarChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="text-muted-foreground text-center text-sm py-4">Not enough income/expense data in {globalAppCurrency} for this chart.</p>
+                <p className="text-muted-foreground text-center text-sm py-4">Not enough income/expense data for this chart.</p>
               )}
             </div>
 
             {expenseChartData.length > 0 && (
             <div>
-              <h3 className="text-md font-semibold mb-2 text-center text-destructive">Top Expense Categories ({globalAppCurrency})</h3>
+              <h3 className="text-md font-semibold mb-2 text-center text-destructive">Top Expense Categories ({globalAppCurrency} display)</h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <RechartsPieChart>
                     <Pie
@@ -153,8 +150,8 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
                 </ResponsiveContainer>
             </div>
             )}
-            {expenseChartData.length === 0 && relevantTransactions.length > 0 && ( // Only show this if there are relevant (same currency) transactions but no expenses among them
-                 <p className="text-muted-foreground text-center text-sm py-4">No expenses recorded in {globalAppCurrency} to show category breakdown.</p>
+            {expenseChartData.length === 0 && transactions.length > 0 && ( 
+                 <p className="text-muted-foreground text-center text-sm py-4">No expenses recorded to show category breakdown.</p>
             )}
           </>
         )}
