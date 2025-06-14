@@ -1,3 +1,4 @@
+
 // src/components/moneymate/ReportsSection.tsx
 "use client";
 
@@ -85,7 +86,10 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
                 <BarChart className="mr-2 h-6 w-6 text-primary" />
                 Financial Summary
                 </CardTitle>
-                <CardDescription>Visualizing all transactions. Values displayed in charts use your global currency setting ({globalAppCurrency}).</CardDescription>
+                <CardDescription>
+                  Visualizing all transactions. Values displayed in charts use your global currency setting ({globalAppCurrency}) for formatting.
+                  Note: If transactions exist in multiple currencies, chart values are direct aggregates of amounts.
+                </CardDescription>
             </div>
             <Button onClick={handleDownloadReport} variant="outline" size="sm" disabled={transactions.length === 0}>
                 <Download className="mr-2 h-4 w-4" />
@@ -113,7 +117,7 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
                     <Legend wrapperStyle={{ fontSize: '12px' }} />
                     <Bar dataKey="value" name="Amount" >
                        {incomeExpenseChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.name === 'Total Income' ? 'hsl(var(--chart-2))' : 'hsl(var(--chart-5))'} />
+                        <Cell key={`cell-${index}`} fill={entry.name === 'Total Income' ? 'hsl(var(--chart-2))' : 'hsl(var(--destructive))'} />
                       ))}
                     </Bar>
                   </RechartsBarChart>
@@ -159,3 +163,4 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
     </Card>
   );
 }
+
