@@ -116,7 +116,10 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
                     <Legend wrapperStyle={{ fontSize: '12px' }} />
                     <Bar dataKey="value" name="Amount" >
                        {incomeExpenseChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.name === 'Total Income' ? 'hsl(var(--chart-2))' : 'hsl(var(--destructive))'} />
+                        <Cell 
+                            key={`cell-${index}`} 
+                            fill={entry.name === 'Total Income' ? 'hsl(142.1, 70.6%, 45.3%)' : 'hsl(var(--destructive))'} // Green for income, red for expenses
+                        />
                       ))}
                     </Bar>
                   </RechartsBarChart>
@@ -162,3 +165,4 @@ export default function ReportsSection({ transactions }: ReportsSectionProps) {
     </Card>
   );
 }
+
