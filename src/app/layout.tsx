@@ -17,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning> {/* suppressHydrationWarning is important for theme switching */}
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -26,10 +26,7 @@ export default function RootLayout({
       <body className="font-body antialiased min-h-screen flex flex-col bg-background text-foreground">
         <AuthProvider>
           <AppSettingsProvider>
-            <ThemeProvider> {/* Wrap with ThemeProvider */}
-              {children}
-              <Toaster />
-            </ThemeProvider>
+            <ThemeProvider>{children}<Toaster /></ThemeProvider>
           </AppSettingsProvider>
         </AuthProvider>
       </body>
