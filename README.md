@@ -1,29 +1,35 @@
 # 💸 MoneyMate – Your Smart Expense & Income Tracker
 
-**MoneyMate** is a modern personal finance web application that empowers users to manage their expenses and income, track spending habits, and get insights to make smarter financial decisions. It's fast, secure, and designed with simplicity in mind.
+**MoneyMate** is a modern, full-stack personal finance tracker that helps users manage their income and expenses, visualize financial data, and make better money decisions. Built for speed, clarity, and security.
 
 ---
 
 ## 🚀 Features
 
-- ✅ Add, edit & delete **expenses** and **income**
-- 📊 View real-time **financial summaries**
-- 📅 Maintain a detailed **transaction history**
-- 🧠 AI-powered budget suggestions *(coming soon)*
-- 🔒 Firebase-powered authentication
+- ✅ Add, edit, and delete **expenses** and **income**
+- 📊 View real-time **financial summaries** with visual charts
+- 📅 Access a detailed **transaction history**
+- 🔒 Secure **Firebase authentication**
 - 🧭 Intuitive sidebar navigation
-- 🌗 Light/Dark mode *(optional)*
-
-
-## 🧰 Tech Stack
-
-| Frontend | Backend | Database | Auth | Tools |
-|----------|---------|----------|------|-------|
-| React.js | Node.js | MongoDB  | Firebase | Express, Chart.js, dotenv |
+- 🌗 Optional **Dark/Light mode**
 
 ---
 
-## 📦 Folder Structure
+## 🧰 Tech Stack
+
+| Category  | Tech Used                         |
+|-----------|-----------------------------------|
+| Frontend  | React.js, Chart.js                |
+| Backend   | Node.js, Express.js               |
+| Database  | MongoDB                           |
+| Auth      | Firebase Authentication           |
+| Styling   | CSS, Tailwind (optional)          |
+| Tools     | dotenv, concurrently (dev)        |
+
+---
+
+## 📁 Folder Structure
+
 Money-Mate-Main/
 │
 ├── client/ # React frontend
@@ -33,39 +39,42 @@ Money-Mate-Main/
 │ ├── pages/
 │ └── utils/
 │
-├── server/ # Node + Express backend (if applicable)
+├── server/ # Node + Express backend
+│ ├── controllers/
 │ ├── models/
-│ ├── routes/
-│ └── controllers/
+│ └── routes/
 │
 ├── .env # Environment variables
-├── package.json
-└── README.md
+├── package.json # Project metadata and scripts
+└── README.md # Project overview
 
 ## 🔧 Getting Started
 
 ### ⚙️ Prerequisites
 
-- Node.js & npm installed
-- MongoDB Atlas or local MongoDB
-- Firebase account and project
+- [Node.js](https://nodejs.org/) & npm
+- MongoDB Atlas (or local MongoDB setup)
+- Firebase project (for authentication)
 
-### 🛠️ Installation Steps
+---
+
+### 🛠️ Installation
 
 1. **Clone the repository**
 
 ```bash
 git clone https://github.com/omkarawaregithub/Money-Mate-Main.git
 cd Money-Mate-Main
-Install dependencies
 
-bash
-Copy
-Edit
+##Install dependencies
+
 npm install
-Configure .env
+cd client && npm install
+cd ../server && npm install
 
-Create a .env file in the root directory and add:
+Configure environment variables
+
+Create a .env file in the root of your project and add:
 
 env
 Copy
@@ -78,17 +87,24 @@ REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 REACT_APP_FIREBASE_APP_ID=your_app_id
 REACT_APP_FIREBASE_MEASUREMENT_ID=your_measurement_id
 REACT_APP_MONGO_URI=your_mongodb_connection_string
-Start the project
-
+▶️ Run the App
 bash
 Copy
 Edit
-npm start
-Visit http://localhost:3000 in your browser.
+
+# In the root directory:
+npm run dev
+This runs both frontend and backend together using concurrently.
+Visit: http://localhost:3000
 
 🧪 Example Use Cases
-Track daily/monthly/yearly spending
+✅ Track daily, monthly, and yearly expenses
 
-Visualize income vs. expenses
+✅ Visualize income vs. expenses in bar and pie charts
 
-Log recurring transactions
+✅ Log recurring transactions
+
+✅ Use financial insights to budget smarter
+
+✅ Access historical expense history for analysis
+
